@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The SCENE</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+        }
+
+        .hud {
+            position: fixed;
+            left: 12px;
+            bottom: 12px;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, .55);
+            color: #fff;
+            font: 14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+            border-radius: 8px;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .hud kbd {
+            background: #111;
+            border: 1px solid #333;
+            border-bottom-width: 2px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .track {
+            margin-top: 6px;
+            opacity: .9
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Heads‑up instructions (not part of the scene) -->
+    <div class="hud">
+        <div>
+            <strong>Move:</strong>
+            <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+            • <strong>Look:</strong> mouse / drag • <strong>VR:</strong> click the goggles icon
+        </div>
+        <div class="track"><strong>Now playing:</strong> <span id="trackTitle">—</span></div>
+    </div>
+
+    <a-scene>
+        <a-assets>
+            <img id="sky" src="./src/textures/nebo.jpg">
+            <audio id="t0" src="./src/audio/cyber_stroll.mp3" crossorigin="anonymous"></audio>
+            <audio id="t1" src="./src/audio/electric_neon_heart.mp3" crossorigin="anonymous"></audio>
+            <audio id="t2" src="./src/audio/neon_streets.mp3" crossorigin="anonymous"></audio>
+            <audio id="t3" src="./src/audio/neon_streets.mp3" crossorigin="anonymous"></audio>
+        </a-assets>
+
+        <!-- камера с курсором (raycaster только по .clickable) -->
+        <a-camera>
+            <a-cursor raycaster="objects: .clickable"></a-cursor>
+        </a-camera>
+
+        <!-- контроллеры с лучом -->
+        <a-entity id="leftHand" laser-controls="hand: left" raycaster="objects: .clickable"></a-entity>
+        <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
+
+        <!-- ЕДИНЫЙ плеер, на который будем переключать src -->
+        <a-sound id="music" src="#t0" autoplay="false"></a-sound>
+
+        <!-- небо/пол -->
+        <a-sky src="#sky" repeat="1 1"></a-sky>
+        <a-plane color="#000" height="20" width="20" rotation="-90 0 0" metalness="1"></a-plane>
+
+        <!-- коробка (play/pause) -->
+        <a-box id="jukebox" position="0 1 -3" color="#4CC3D9" class="clickable"></a-box>
+
+        <!-- 3D triangular "previous" (left) -->
+        <a-entity id="prevBtn" class="clickable" position="-1.5 1 -3"
+            geometry="primitive: cone; segmentsRadial: 3; height: 0.6; radiusBottom: 0.45; radiusTop: 0"
+            rotation="0 90 0" color="#FFC65D"></a-entity>
+
+        <!-- 3D triangular "next" (right) -->
+        <a-entity id="nextBtn" class="clickable" position="1.5 1 -3"
+            geometry="primitive: cone; segmentsRadial: 3; height: 0.6; radiusBottom: 0.45; radiusTop: 0"
+            rotation="0 -90 0" color="#FFC65D"></a-entity>
+    </a-scene>
+
+    <!-- бандл, где импортируется 'aframe' через npm -->
+    <script type="module" src="/src/main.js"></script>
+
+    <script>
+        // ---- Playlist data ----
+        const PLAYLIST = [
+            { id: '#t0', title: 'Cyber Stroll' },
+            { id: '#t1', title: 'Electric Neon Heart' },
+            { id: '#t2', title: 'Neon Streets' },
+            { id: '#t3', title: 'Synth Beat' },
+        ];
+
+        // Utility: toggle A-Frame <a-sound>
+        function toggleSound(soundEl) {
+            const sound = soundEl.components.sound;
+            if (!sound) return;
+            if (sound.isPlaying) sound.stopSound(); else sound.playSound();
+        }
+
+        function setTrack(soundEl, idx) {
+            const clamped = ((idx % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length; // wrap both directions
+            const track = PLAYLIST[clamped];
+            soundEl.setAttribute('src', track.id);
+            // Force reload to avoid stale buffer
+            const comp = soundEl.components.sound;
+            if (comp && comp.pool && comp.pool.children.length) {
+                comp.pool.children.forEach((a) => { a.pause(); a.currentTime = 0; });
+            }
+            const title = document.querySelector('#trackTitle');
+            if (title) title.textContent = `${clamped + 1}/${PLAYLIST.length} — ${track.title}`;
+            soundEl.emit('trackchanged', { index: clamped }, false);
+            return clamped;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const scene = document.querySelector('a-scene');
+            const box = document.querySelector('#jukebox');
+            const music = document.querySelector('#music'); // БЫЛО #t0 — теперь верно
+            const left = document.querySelector('#leftHand');
+            const right = document.querySelector('#rightHand');
+            const prevBtn = document.querySelector('#prevBtn');
+            const nextBtn = document.querySelector('#nextBtn');
+
+            let index = 0;
+            index = setTrack(music, index);
+
+            // Desktop interactions
+            box.addEventListener('click', () => toggleSound(music));
+            prevBtn.addEventListener('click', () => { index = setTrack(music, index - 1); music.components.sound.playSound(); });
+            nextBtn.addEventListener('click', () => { index = setTrack(music, index + 1); music.components.sound.playSound(); });
+
+            // Hover highlight for better UX
+            const hover = (el, base, over) => {
+                el.addEventListener('mouseenter', () => el.setAttribute('color', over));
+                el.addEventListener('mouseleave', () => el.setAttribute('color', base));
+            };
+            hover(box, '#4CC3D9', '#26a8d8');
+            hover(prevBtn, '#FFC65D', '#ffd588');
+            hover(nextBtn, '#FFC65D', '#ffd588');
+
+            // Keyboard shortcuts (desktop): J = prev, K = play/pause, L = next
+            window.addEventListener('keydown', (e) => {
+                if (e.repeat) return;
+                if (e.key === 'k' || e.key === 'K') toggleSound(music);
+                if (e.key === 'j' || e.key === 'J') { index = setTrack(music, index - 1); music.components.sound.playSound(); }
+                if (e.key === 'l' || e.key === 'L') { index = setTrack(music, index + 1); music.components.sound.playSound(); }
+            });
+
+            // VR controller trigger logic with raycaster hit-test
+            const attachTrigger = (hand) => {
+                if (!hand) return;
+                const ready = () => {
+                    hand.addEventListener('triggerdown', () => {
+                        const ray = hand.components.raycaster; if (!ray) return;
+                        const hits = ray.intersectedEls || [];
+                        if (hits.includes(box)) toggleSound(music);
+                        if (hits.includes(prevBtn)) { index = setTrack(music, index - 1); music.components.sound.playSound(); }
+                        if (hits.includes(nextBtn)) { index = setTrack(music, index + 1); music.components.sound.playSound(); }
+                    });
+                };
+                if (hand.hasLoaded) ready(); else hand.addEventListener('loaded', ready, { once: true });
+            };
+
+            scene.addEventListener('loaded', () => { attachTrigger(left); attachTrigger(right); });
+        });
+    </script>
+</body>
+
+</html>
