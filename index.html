@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/styles.css">
     <title>The SCENE</title>
 </head>
 
@@ -20,57 +19,114 @@
     </div>
 
     <!-- SCENE START -->
-  <a-scene shadow="type: pcfsoft">
-    <a-assets timeout="30000">
-      <img id="sky" src="/textures/sky.jpg">
-      <audio id="t0" src="/audio/cyber_stroll.mp3" crossorigin="anonymous"></audio>
-      <audio id="t1" src="/audio/electric_neon_heart.mp3" crossorigin="anonymous"></audio>
-      <audio id="t2" src="/audio/neon_streets.mp3" crossorigin="anonymous"></audio>
-      <a-asset-item id="droide" src="/models/droide.glb" crossorigin="anonymous"></a-asset-item>
-    </a-assets>
+    <a-scene shadow="type: pcfsoft">
+        <a-assets timeout="30000">
+            <img id="sky" src="/textures/sky.jpg">
+            <audio id="t0" src="/audio/cyber_stroll.mp3" crossorigin="anonymous"></audio>
+            <audio id="t1" src="/audio/electric_neon_heart.mp3" crossorigin="anonymous"></audio>
+            <audio id="t2" src="/audio/neon_streets.mp3" crossorigin="anonymous"></audio>
+            <audio id="t3" src="/audio/synth_beat.mp3" crossorigin="anonymous"></audio>
+            <audio id="t4" src="/audio/night_highway.mp3" crossorigin="anonymous"></audio>
+            <a-asset-item id="droide" src="/models/droide.glb" crossorigin="anonymous"></a-asset-item>
+            <a-asset-item id="jupiter" src="/models/jupiter.glb" crossorigin="anonymous"></a-asset-item>
+            <a-asset-item id="table" src="/models/sci-fi_table.glb" crossorigin="anonymous"></a-asset-item>
+            <a-asset-item id="music_box" src="/models/music_box.glb" crossorigin="anonymous"></a-asset-item>
+        </a-assets>
 
-    <!-- RIG: движение по навмешу -->
-    <!-- ВАЖНО: риг на уровне пола (y=0), а высота — у камеры (y≈1.6) -->
-    <a-entity id="rig" movement-controls="constrainToNavMesh: true" position="0 0 0">
-      <a-entity camera position="0 1.6 0" look-controls="pointerLockEnabled: true"
-                cursor="rayOrigin: mouse"
-                raycaster="objects: .clickable; far: 50; rayOrigin: mouse"></a-entity>
-    </a-entity>
+        <!-- RIG: движение по навмешу -->
+        <a-entity id="rig" movement-controls="constrainToNavMesh: true" position="0 0 0">
+            <a-entity camera position="0 1.6 0" look-controls="pointerLockEnabled: true" cursor="rayOrigin: mouse"
+                raycaster="objects: .clickable; far: 50; rayOrigin: mouse">
+            </a-entity>
+        </a-entity>
 
-    <!-- Свет -->
-    <a-entity light="type: ambient; intensity: 0.5"></a-entity>
-    <a-entity id="sun" light="type: directional; intensity: 2; castShadow: true"
-              position="2 6 4"></a-entity>
+        <!-- Свет -->
+        <a-entity light="type: ambient; intensity: 1"></a-entity>
+        <a-entity id="sun" light="type: directional; intensity: 1; castShadow: true" position="2 6 4"></a-entity>
 
-    <!-- Небо и пол (пол = навмеш) -->
-    <a-sky src="#sky"></a-sky>
-    <a-plane nav-mesh color="#222" width="30" height="30" rotation="-90 0 0"
-             shadow="receive: true"></a-plane>
+        <!-- Небо и пол (пол = навмеш) -->
+        <a-sky src="#sky"></a-sky>
+        <a-plane nav-mesh color="#10041c" width="30" height="30" rotation="-90 0 0" shadow="receive: true"></a-plane>
 
-    <!-- Кнопки-пирамидки -->
-    <a-entity id="prevBtn" class="clickable" position="-1.5 1 -3"
-              geometry="primitive: cone; segmentsRadial: 3; height: 0.6; radiusBottom: 0.45; radiusTop: 0"
-              rotation="0 90 0" color="#FFC65D"></a-entity>
+        <a-entity id="holoPanel" position="-2.2 1.45 -5" rotation="0 10 0"
+            animation__float="property: position; to: -2.2 1.52 -5; dir: alternate; loop: true; dur: 2200; easing: easeInOutSine">
 
-    <a-entity id="nextBtn" class="clickable" position="1.5 1 -3"
-              geometry="primitive: cone; segmentsRadial: 3; height: 0.6; radiusBottom: 0.45; radiusTop: 0"
-              rotation="0 -90 0" color="#FFC65D"></a-entity>
+            <!-- Фон экрана -->
+            <a-entity geometry="primitive: plane; width: 0.9; height: 1.2"
+                material="shader: standard; color: #00e1ff; transparent: true; opacity: 0.15; metalness: 0; roughness: 1; emissive: #00e1ff; emissiveIntensity: 0.35"
+                position="0 0 0.000"></a-entity>
 
-    <!-- Jukebox (play/pause) -->
-    <a-box id="jukebox" position="0 1 -3" color="#4CC3D9" class="clickable"></a-box>
+            <!-- Рамка (выведена вперёд, чтобы не конфликтовать по Z) -->
+            <a-entity geometry="primitive: plane; width: 0.92; height: 1.22"
+                material="shader: standard; color: #00e1ff; wireframe: true; transparent: true; opacity: 0.35; emissive: #00e1ff; emissiveIntensity: 0.6"
+                position="0 0 0.008"></a-entity>
 
-    <!-- Единый плеер -->
-    <a-sound id="music" src="#t0" autoplay="false" positional="false"></a-sound>
+            <!-- Хайлайт выбранной строки -->
+            <a-entity id="holoHighlight" geometry="primitive: plane; width: 0.86; height: 0.18"
+                material="shader: standard; color: #00ffff; transparent: true; opacity: 0.18; emissive: #00ffff; emissiveIntensity: 0.6"
+                position="0 0.36 0.003"
+                animation__pulse="property: material.opacity; from: 0.12; to: 0.22; dir: alternate; loop: true; dur: 1200; easing: easeInOutSine">
+            </a-entity>
 
-    <!-- Робот с тенью -->
-    <a-entity id="robot" gltf-model="#droide" animation-mixer="clip: motion"
-              position="0 0 -6" rotation="0 180 0" scale="1 1 1"
-              shadow="cast: true"></a-entity>
+            <!-- Заголовок -->
+            <a-entity position="-0.43 0.52 0.004"
+                text="value: PLAYLIST; width: 0.9; anchor: left; align: left; color: #BFFFFF"></a-entity>
 
-    <!-- Лазеры для VR-контроллеров (не мешают мыши) -->
-    <a-entity id="leftHand"  laser-controls="hand: left"  raycaster="objects: .clickable"></a-entity>
-    <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
-  </a-scene>
+            <!-- Строки: невидимые hit‑плоскости + текст с левым якорем -->
+            <a-entity class="track-line-hit clickable" data-track="#t0" data-label="1. Cyber Stroll"
+                position="0 0.36 0.004" geometry="primitive: plane; width: 0.86; height: 0.18"
+                material="transparent: true; opacity: 0.0">
+                <a-entity class="track-text" data-idx="0" position="-0.43 0 0.001"
+                    text="value: 1. Cyber Stroll; width: 0.9; anchor: left; align: left; color: #CFFFFF"></a-entity>
+            </a-entity>
+
+            <a-entity class="track-line-hit clickable" data-track="#t1" data-label="2. Electric Neon Heart"
+                position="0 0.18 0.004" geometry="primitive: plane; width: 0.86; height: 0.18"
+                material="transparent: true; opacity: 0.0">
+                <a-entity class="track-text" data-idx="1" position="-0.43 0 0.001"
+                    text="value: 2. Electric Neon Heart; width: 0.9; anchor: left; align: left; color: #CFFFFF"></a-entity>
+            </a-entity>
+
+            <a-entity class="track-line-hit clickable" data-track="#t2" data-label="3. Neon Streets"
+                position="0 0.00 0.004" geometry="primitive: plane; width: 0.86; height: 0.18"
+                material="transparent: true; opacity: 0.0">
+                <a-entity class="track-text" data-idx="2" position="-0.43 0 0.001"
+                    text="value: 3. Neon Streets; width: 0.9; anchor: left; align: left; color: #CFFFFF"></a-entity>
+            </a-entity>
+
+            <a-entity class="track-line-hit clickable" data-track="#t3" data-label="4. Synth Beat"
+                position="0 -0.18 0.004" geometry="primitive: plane; width: 0.86; height: 0.18"
+                material="transparent: true; opacity: 0.0">
+                <a-entity class="track-text" data-idx="3" position="-0.43 0 0.001"
+                    text="value: 4. Synth Beat; width: 0.9; anchor: left; align: left; color: #CFFFFF"></a-entity>
+            </a-entity>
+
+            <a-entity class="track-line-hit clickable" data-track="#t4" data-label="5. Night Highway"
+                position="0 -0.36 0.004" geometry="primitive: plane; width: 0.86; height: 0.18"
+                material="transparent: true; opacity: 0.0">
+                <a-entity class="track-text" data-idx="4" position="-0.43 0 0.001"
+                    text="value: 5. Night Highway; width: 0.9; anchor: left; align: left; color: #CFFFFF"></a-entity>
+            </a-entity>
+        </a-entity>
+
+
+        <!-- Единый плеер -->
+        <a-sound id="music" src="#t0" autoplay="false" positional="false"></a-sound>
+
+        <!-- Робот с тенью -->
+        <a-entity id="robot" gltf-model="#droide" animation-mixer="clip: motion" position="0 0 -6" rotation="0 180 0"
+            scale="1 1 1" shadow="cast: true"></a-entity>
+
+        <a-entity id="planet" gltf-model="#jupiter" position="0 6 -40" scale="8 8 8"></a-entity>
+        <a-entity id="sci_fi_table" gltf-model="#table" position="-3 0.7 -5" scale="1 1 1"
+            shadow="cast: true"></a-entity>
+        <a-entity gltf-model="#music_box" position="-2.2 0.75 -5" scale="1 1 1" shadow="cast: true"></a-entity>
+
+
+        <!-- Лазеры для VR-контроллеров (не мешают мыши) -->
+        <a-entity id="leftHand" laser-controls="hand: left" raycaster="objects: .clickable"></a-entity>
+        <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
+    </a-scene>
 
     <!-- бандл, где импортируется 'aframe' через npm -->
     <script type="module" src="/src/main.js"></script>
