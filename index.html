@@ -20,56 +20,57 @@
     </div>
 
     <!-- SCENE START -->
-    <a-scene>
-        <a-assets timeout="30000">
-            <img id="sky" src="./src/textures/sky.jpg">
-            <audio id="t0" src="./src/audio/cyber_stroll.mp3" crossorigin="anonymous"></audio>
-            <audio id="t1" src="./src/audio/electric_neon_heart.mp3" crossorigin="anonymous"></audio>
-            <audio id="t2" src="./src/audio/neon_streets.mp3" crossorigin="anonymous"></audio>
-            <audio id="t3" src="./src/audio/neon_streets.mp3" crossorigin="anonymous"></audio>
-            <a-asset-item id="droide" src="./src/models/droide.glb" crossorigin="anonymous"></a-asset-item>
-        </a-assets>
+  <a-scene shadow="type: pcfsoft">
+    <a-assets timeout="30000">
+      <img id="sky" src="/textures/sky.jpg">
+      <audio id="t0" src="/audio/cyber_stroll.mp3" crossorigin="anonymous"></audio>
+      <audio id="t1" src="/audio/electric_neon_heart.mp3" crossorigin="anonymous"></audio>
+      <audio id="t2" src="/audio/neon_streets.mp3" crossorigin="anonymous"></audio>
+      <a-asset-item id="droide" src="/models/droide.glb" crossorigin="anonymous"></a-asset-item>
+    </a-assets>
 
-        <!-- камера с курсором (raycaster только по .clickable) -->
-        <a-camera>
-            <a-cursor raycaster="objects: .clickable"></a-cursor>
-        </a-camera>
+    <!-- RIG: движение по навмешу -->
+    <!-- ВАЖНО: риг на уровне пола (y=0), а высота — у камеры (y≈1.6) -->
+    <a-entity id="rig" movement-controls="constrainToNavMesh: true" position="0 0 0">
+      <a-entity camera position="0 1.6 0" look-controls="pointerLockEnabled: true"
+                cursor="rayOrigin: mouse"
+                raycaster="objects: .clickable; far: 50; rayOrigin: mouse"></a-entity>
+    </a-entity>
 
-        <!-- контроллеры с лучом -->
-        <a-entity id="leftHand" laser-controls="hand: left" raycaster="objects: .clickable"></a-entity>
-        <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
+    <!-- Свет -->
+    <a-entity light="type: ambient; intensity: 0.5"></a-entity>
+    <a-entity id="sun" light="type: directional; intensity: 2; castShadow: true"
+              position="2 6 4"></a-entity>
 
-        <!-- ЕДИНЫЙ плеер, на который будем переключать src -->
-        <a-sound id="music" src="#t0" autoplay="false"></a-sound>
+    <!-- Небо и пол (пол = навмеш) -->
+    <a-sky src="#sky"></a-sky>
+    <a-plane nav-mesh color="#222" width="30" height="30" rotation="-90 0 0"
+             shadow="receive: true"></a-plane>
 
-        <!-- небо/пол -->
-        <a-sky src="#sky"></a-sky>
-        <a-plane color="#000" height="20" width="20" rotation="-90 0 0" metalness="1"></a-plane>
+    <!-- Кнопки-пирамидки -->
+    <a-entity id="prevBtn" class="clickable" position="-1.5 1 -3"
+              geometry="primitive: cone; segmentsRadial: 3; height: 0.6; radiusBottom: 0.45; radiusTop: 0"
+              rotation="0 90 0" color="#FFC65D"></a-entity>
 
-        <a-entity light="type: directional; intensity: 6" position="1 3 2"></a-entity>
+    <a-entity id="nextBtn" class="clickable" position="1.5 1 -3"
+              geometry="primitive: cone; segmentsRadial: 3; height: 0.6; radiusBottom: 0.45; radiusTop: 0"
+              rotation="0 -90 0" color="#FFC65D"></a-entity>
 
-        <!-- коробка (play/pause) -->
-        <a-box id="jukebox" position="0 1 -3" color="#4CC3D9" class="clickable"></a-box>
+    <!-- Jukebox (play/pause) -->
+    <a-box id="jukebox" position="0 1 -3" color="#4CC3D9" class="clickable"></a-box>
 
-        <a-entity 
-            id="robot"
-            gltf-model="#droide" 
-            animation-mixer="clip: motion; loop: once; clampWhenFinished: true; timeScale: 0"
-            position="0 0 9" 
-            rotation="0 180 0" 
-            scale="1 1 1">
-        </a-entity>
+    <!-- Единый плеер -->
+    <a-sound id="music" src="#t0" autoplay="false" positional="false"></a-sound>
 
-        <!-- 3D triangular "previous" (left) -->
-        <a-entity id="prevBtn" class="clickable" position="-1.5 1 -3"
-            geometry="primitive: cone; segmentsRadial: 3; height: 0.6; radiusBottom: 0.45; radiusTop: 0"
-            rotation="0 90 0" color="#FFC65D"></a-entity>
+    <!-- Робот с тенью -->
+    <a-entity id="robot" gltf-model="#droide" animation-mixer="clip: motion"
+              position="0 0 -6" rotation="0 180 0" scale="1 1 1"
+              shadow="cast: true"></a-entity>
 
-        <!-- 3D triangular "next" (right) -->
-        <a-entity id="nextBtn" class="clickable" position="1.5 1 -3"
-            geometry="primitive: cone; segmentsRadial: 3; height: 0.6; radiusBottom: 0.45; radiusTop: 0"
-            rotation="0 -90 0" color="#FFC65D"></a-entity>
-    </a-scene>
+    <!-- Лазеры для VR-контроллеров (не мешают мыши) -->
+    <a-entity id="leftHand"  laser-controls="hand: left"  raycaster="objects: .clickable"></a-entity>
+    <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
+  </a-scene>
 
     <!-- бандл, где импортируется 'aframe' через npm -->
     <script type="module" src="/src/main.js"></script>
