@@ -9,7 +9,7 @@
 
 <body>
     <!-- SCENE START -->
-    <a-scene shadow="type: pcfsoft" renderer="antialias: true;">
+    <a-scene shadow="type: pcfsoft" renderer="antialias: true;" loading-screen="dotsColor: red; backgroundColor: black">
         <a-assets timeout="30000">
             <img id="sky" src="/textures/sky.jpg">
             <audio id="t0" src="/audio/cyber_stroll.mp3" crossorigin="anonymous"></audio>
@@ -18,6 +18,8 @@
             <audio id="t3" src="/audio/synth_beat.mp3" crossorigin="anonymous"></audio>
             <audio id="t4" src="/audio/night_highway.mp3" crossorigin="anonymous"></audio>
             <a-asset-item id="droide" src="/models/droide.glb" crossorigin="anonymous"></a-asset-item>
+            <a-asset-item id="leftController" src="/models/quest-touch-plus-left.glb" crossorigin="anonymous"></a-asset-item>
+            <a-asset-item id="rightController" src="/models/quest-touch-plus-right.glb" crossorigin="anonymous"></a-asset-item>
             <a-asset-item id="jupiter" src="/models/jupiter.glb" crossorigin="anonymous"></a-asset-item>
             <a-asset-item id="table" src="/models/sci-fi_table.glb" crossorigin="anonymous"></a-asset-item>
             <a-asset-item id="music_box" src="/models/music_box.glb" crossorigin="anonymous"></a-asset-item>
@@ -41,15 +43,23 @@
             <a-camera position="0 1.7 0" look-controls="pointerLockEnabled: true"></a-camera>
 
             <!-- Курсор для МЫШИ: отдельный источник луча, без геометрии -->
-            <a-entity id="mouseRay" cursor="rayOrigin: mouse" raycaster="objects: .clickable; far: 10">
-            </a-entity>
+            <a-entity id="mouseRay" cursor="rayOrigin: mouse" raycaster="objects: .clickable; far: 10"></a-entity>
 
             <!-- Лазеры VR-контроллеров -->
-            <a-entity id="leftHand" laser-controls meta-touch-controls="hand: left"
-                raycaster="objects: .clickable; far: 10"></a-entity>
-            <a-entity id="rightHand" laser-controls meta-touch-controls="hand: right"
-                raycaster="objects: .clickable; far: 10"></a-entity>
-
+            <a-entity id="leftHand" 
+                laser-controls 
+                meta-touch-controls="hand: left"
+                raycaster="objects: .clickable; far: 10; lineColor: red; lineOpacity: 0.5" 
+                model="#leftController"
+                thumbstick-logging>
+            </a-entity>
+            <a-entity id="rightHand" 
+                laser-controls 
+                meta-touch-controls="hand: right"
+                raycaster="objects: .clickable; far: 10; lineColor: red; lineOpacity: 0.5"
+                model="#rightController" 
+                thumbstick-logging>
+            </a-entity>
         </a-entity>
 
 
