@@ -56,10 +56,6 @@
         </a-entity>
 
 
-        <!-- Единый плеер -->
-        <a-sound id="music" src="#t0" autoplay="false" positional="false">
-        </a-sound>
-
         <!-- Робот с тенью -->
         <a-entity id="robot" gltf-model="#droide" animation-mixer="clip: motion" position="0 0 -6" rotation="0 180 0"
             scale="1 1 1" shadow="cast: true">
@@ -80,8 +76,10 @@
         <a-plane id="screen" position="-3 0.75 -5" width="1.1" height="0.61" rotation="-90 0 0" opacity="0.7"
             color="#20B2AA" style="border-radius: 10px;">
         </a-plane>
-        <a-entity gltf-model="#music_box" position="-2.2 0.75 -5" scale="1 1 1" shadow="cast: true">
+        <a-entity gltf-model="#music_box" position="-2.2 0.75 -5" scale="1 1 1" shadow="cast: true" class="clickable"
+            sound="src: #t4; on: click; loop: false; positional: true" >
         </a-entity>
+
     </a-scene>
 
     <!-- бандл, где импортируется 'aframe' через npm -->
