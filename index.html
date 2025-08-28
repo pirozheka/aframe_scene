@@ -20,7 +20,7 @@
             <audio id="t4" src="/audio/night_highway.mp3" crossorigin="anonymous"></audio>
             <a-asset-item id="droide" src="/models/droide.glb" crossorigin="anonymous"></a-asset-item>
             <a-asset-item id="rover" src="/models/perseverance.glb" crossorigin="anonymous"></a-asset-item>
-            <a-asset-item id="home" src="/models/habitat.glb" crossorigin="anonymous"></a-asset-item>
+            <a-asset-item id="planet" src="/models/mars.glb" crossorigin="anonymous"></a-asset-item>
             <a-asset-item id="table" src="/models/sci-fi_table.glb" crossorigin="anonymous"></a-asset-item>
             <a-asset-item id="music_box" src="/models/music_box.glb" crossorigin="anonymous"></a-asset-item>
         </a-assets>
@@ -65,10 +65,10 @@
             shadow="cast: true">
         </a-entity>
 
-        <a-sphere src="#jupiter" position="7 20 -40" radius="6" opacity="0.8"
-            animation="property: rotation; to: 0 360 0; loop: true; dur: 200000; easing: linear;">
+        <a-entity id="mars" gltf-model="#planet" position="10 10 -200" scale="80 80 80"
+            animation="property: rotation; to: 0 360 0; loop: true; dur: 800000; easing: linear;">
+        </a-entity>
 
-        </a-sphere>
 
         <a-entity id="sci_fi_table" gltf-model="#table" position="-3 0.7 -5" scale="1 1 1" shadow="cast: true">
         </a-entity>
@@ -77,7 +77,7 @@
             color="#20B2AA" style="border-radius: 10px;">
         </a-plane>
         <a-entity gltf-model="#music_box" position="-2.2 0.75 -5" scale="1 1 1" shadow="cast: true" class="clickable"
-            sound="src: #t4; on: click; loop: false; positional: true" >
+            sound="src: #t4; on: click; loop: false; positional: true">
         </a-entity>
 
     </a-scene>
@@ -85,5 +85,6 @@
     <!-- бандл, где импортируется 'aframe' через npm -->
     <script type="module" src="/src/main.js"></script>
 </body>
+
 
 </html>
